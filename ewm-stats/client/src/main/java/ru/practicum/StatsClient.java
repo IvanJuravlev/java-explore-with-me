@@ -23,7 +23,7 @@ public class StatsClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(endpointHitDto))
                 .exchangeToMono(response -> {
-                    if(response.statusCode().equals(HttpStatus.CREATED)) {
+                    if (response.statusCode().equals(HttpStatus.CREATED)) {
                         return response.bodyToMono(Object.class)
                                 .map(body -> ResponseEntity.status(HttpStatus.CREATED).body(body));
                     } else {
