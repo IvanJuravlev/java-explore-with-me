@@ -24,6 +24,6 @@ public class EndpointHit {
     String uri;
     @Column(name = "ip")
     String ip;
-    @Column(name = "app")
+    @Column(name = "timestamp")
     LocalDateTime timestamp;
 }
