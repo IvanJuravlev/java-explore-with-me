@@ -1,7 +1,10 @@
-package ru.practicum.model;
+package ru.practicum.model.event;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.model.Category;
+import ru.practicum.model.Location;
+import ru.practicum.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,45 +19,45 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    private String annotation;
+    String annotation;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category;
+    Category category;
 
     @Column(name = "created_on")
-    private LocalDateTime createdOn;
+    LocalDateTime createdOn;
 
-    private String description;
+    String description;
 
     @Column(name = "event_date")
-    private LocalDateTime eventDate;
+    LocalDateTime eventDate;
 
     @ManyToOne
     @JoinColumn(name = "initiator_id")
-    private User initiator;
+    User initiator;
 
     @ManyToOne
     @JoinColumn(name = "location_id")
-    private Location location;
+    Location location;
 
-    private Boolean paid;
+    Boolean paid;
 
     @Column(name = "participant_limit")
-    private Integer participantLimit;
+    Integer participantLimit;
 
     @Column(name = "published_on")
-    private LocalDateTime publishedOn;
+    LocalDateTime publishedOn;
 
     @Column(name = "request_moderation")
-    private Boolean requestModeration;
+    Boolean requestModeration;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_state")
-    private EventState eventState;
+    EventState eventState;
 
-    private String title;
+    String title;
 }
-}
+
