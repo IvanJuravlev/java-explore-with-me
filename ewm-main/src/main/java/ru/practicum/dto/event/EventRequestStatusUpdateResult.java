@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.List;
 
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.request.RequestDto;
 
 @Getter
 @Setter

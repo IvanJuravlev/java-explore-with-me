@@ -2,6 +2,7 @@ package ru.practicum.dto.event;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.user.ShortUserDto;
 import ru.practicum.model.Location;
 import ru.practicum.model.User;
