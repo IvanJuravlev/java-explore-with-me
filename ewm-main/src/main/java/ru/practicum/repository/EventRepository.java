@@ -3,6 +3,7 @@ package ru.practicum.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.EventState;
 
@@ -24,6 +25,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "FROM Event AS e " +
             "WHERE e.id IN :eventIds")
     List<Event> findEventsByIds(List<Long> eventIds);
+
+//    @Query("select event from Event event " +
+//            "where event.id IN (:ids)")
+//    List<Event> findByIds(@Param("ids") List<Long> ids);
 
     @Query("SELECT e " +
             "FROM Event AS e " +
