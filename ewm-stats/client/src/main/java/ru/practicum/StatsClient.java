@@ -34,7 +34,7 @@ public class StatsClient {
                 .block();
     }
 
-    public ResponseEntity<Object> getViewStatus(
+    public ResponseEntity<Object> getViewStats(
             String start,
             String end,
             List<String> uris,
