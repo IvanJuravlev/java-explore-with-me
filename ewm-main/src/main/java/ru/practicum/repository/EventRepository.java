@@ -30,16 +30,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 //            "where event.id IN (:ids)")
 //    List<Event> findByIds(@Param("ids") List<Long> ids);
 
-    @Query("SELECT e " +
-            "FROM Event AS e " +
-            "WHERE LOWER(e.annotation) LIKE %:text% OR LOWER(e.description) LIKE %:text% " +
-            "AND (:categories is null OR e.category.id IN (:categories)) " +
-            "AND e.paid = :paid " +
-            "AND (:state is null OR e.eventState = :state) " +
-            "AND (coalesce(:start, 'null') is null OR e.eventDate >= :start) " +
-            "AND (coalesce(:end, 'null') is null OR e.eventDate <= :end)")
-    List<Event> findPublicEvents(String text, List<Long> categories, boolean paid, LocalDateTime start,
-                                 LocalDateTime end, EventState state, Pageable pageable);
+
 
     @Query("SELECT e " +
             "FROM Event AS e " +
@@ -50,4 +41,29 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (coalesce(:end, 'null') is null OR e.eventDate <= :end) ")
     List<Event> findAdminEvents(List<Long> users, List<EventState> states, List<Long> categories,
                                 LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+
+
+    @Query("SELECT e " +
+            "FROM Event AS e " +
+            "WHERE " +
+            "(" +
+            ":text IS NULL " +
+            "OR LOWER(e.description) LIKE CONCAT('%', :text, '%') " +
+            "OR LOWER(e.annotation) LIKE CONCAT('%', :text, '%')" +
+            ")" +
+            "AND (:states IS NULL OR e.eventState IN (:states)) " +
+            "AND (:categories IS NULL OR e.category.id IN (:categories)) " +
+            "AND (:paid IS NULL OR e.paid = :paid) " +
+            "AND (CAST(:rangeStart AS date) IS NULL OR e.eventDate >= :rangeStart) " +
+            "AND (CAST(:rangeEnd AS date) IS NULL OR e.eventDate <= :rangeEnd) " +
+            "order by e.eventDate")
+    List<Event> findPublicEvents(
+            @Param("text") String text,
+            @Param("states") List<EventState> states,
+            @Param("categories") List<Long> categories,
+            @Param("paid") Boolean paid,
+            @Param("rangeStart") LocalDateTime rangeStart,
+            @Param("rangeEnd") LocalDateTime rangeEnd,
+            Pageable pageable);
 }

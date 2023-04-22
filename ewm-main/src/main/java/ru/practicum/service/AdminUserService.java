@@ -29,7 +29,7 @@ public class AdminUserService {
     }
 
     public List<UserDto> findAll(List<Long> ids, Pageable pageable) {
-        if(!ids.isEmpty()) {
+        if (!ids.isEmpty()) {
             return userRepository.findAllByIdIn(ids, pageable).stream()
                     .map(UserMapper::toUserDto)
                     .collect(Collectors.toList());

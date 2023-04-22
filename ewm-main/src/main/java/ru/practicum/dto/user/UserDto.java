@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ public class UserDto {
     @Email
     String email;
     @NotNull
+    @NotBlank
     String name;
 
 }

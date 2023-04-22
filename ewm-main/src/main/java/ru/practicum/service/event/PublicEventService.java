@@ -1,6 +1,7 @@
 package ru.practicum.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,18 +16,19 @@ import ru.practicum.model.request.RequestStatus;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestsRepository;
 import ru.practicum.service.event.utils.EventUtils;
-import ru.practicum.service.utils.DateFormatter;
 import ru.practicum.statistics.HitMapper;
 import ru.practicum.statistics.StatService;
 
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PublicEventService {
@@ -35,7 +37,6 @@ public class PublicEventService {
 
     private final RequestsRepository requestsRepository;
 
-    private final EventUtils eventUtils;
 
 
     public FullEventDto getPublicEvent(Long eventId, HttpServletRequest request) {
@@ -51,21 +52,28 @@ public class PublicEventService {
                 RequestStatus.CONFIRMED).size());
         statsService.createView(HitMapper.toEndpointHit("ewm-main-service", request));
 
-        return eventUtils.getViews(Collections.singletonList(fullEventDto), statsService).get(0);
+        return EventUtils.getViews(Collections.singletonList(fullEventDto), statsService).get(0);
     }
+
 
 
     public List<ShortEventDto> getPublicEvents(String text, List<Long> categories, Boolean paid,
                                                String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                                String sort, Pageable pageable, HttpServletRequest request) {
 
-        LocalDateTime start = rangeStart != null ? DateFormatter.toTime(rangeStart) : null;
-        LocalDateTime end = rangeEnd != null ? DateFormatter.toTime(rangeEnd) : null;
+                LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (rangeStart != null) {
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+        if (rangeStart != null) {
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+        if (text == null) text = "";
 
-        checkDateTimePeriod(start, end);
 
-        List<Event> events = eventRepository.findPublicEvents(text.toLowerCase(), categories, paid,
-                start, end, EventState.PUBLISHED, pageable);
+        List<Event> events = eventRepository.findPublicEvents(text.toLowerCase(), List.of(EventState.PUBLISHED),
+                categories, paid, start, end, pageable);
 
         List<FullEventDto> fullEventDtoList = events.stream()
                 .map(EventMapper.EVENT_MAPPER::toFullEventDto)
@@ -80,34 +88,13 @@ public class PublicEventService {
         }
 
         statsService.createView(HitMapper.toEndpointHit("ewm-main-service", request));
-        List<ShortEventDto> eventsShort = eventUtils.getViews(fullEventDtoList, statsService).stream()
+        List<ShortEventDto> eventsShort = EventUtils.getViews(fullEventDtoList, statsService).stream()
                 .map(EventMapper.EVENT_MAPPER::toShortFromFull)
                 .collect(Collectors.toList());
         if (sort != null && sort.equalsIgnoreCase("VIEWS")) {
             eventsShort.sort((e1, e2) -> e2.getViews().compareTo(e1.getViews()));
         }
-        eventUtils.getConfirmedRequests(fullEventDtoList, requestsRepository);
+        EventUtils.getConfirmedRequests(fullEventDtoList, requestsRepository);
         return eventsShort;
-
     }
-
-
-    private void checkDateTimePeriod(LocalDateTime rangeStart, LocalDateTime rangeEnd) {
-        if (rangeStart != null && rangeEnd != null) {
-            if (rangeStart.isAfter(rangeEnd)) {
-                throw new ForbiddenException(
-                        String.format("Start date: %s of the interval must be earlier than the end: %s date",
-                                rangeStart, rangeEnd));
-            }
-        }
-    }
-
-
-
-
-
-
-
-
-
 }

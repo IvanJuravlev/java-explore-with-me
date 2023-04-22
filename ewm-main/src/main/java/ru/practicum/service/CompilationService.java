@@ -27,7 +27,8 @@ public class CompilationService {
 
     @Transactional
     public ResponseCompilationDto create(CompilationDto compilationDto) {
-        List<Event> events = eventRepository.findEventsByIds(compilationDto.getEvents());  //возможно тут проблема, можно использовать другой SQL запрос
+        List<Event> events = eventRepository.findEventsByIds(compilationDto.getEvents());
+        log.info("Compilation is created");
         return CompilationMapper.toResponseCompilationDto(
                 compilationRepository.save(CompilationMapper.toCompilation(compilationDto, events)));
     }

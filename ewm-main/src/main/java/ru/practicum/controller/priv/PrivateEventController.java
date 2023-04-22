@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.*;
 import ru.practicum.dto.request.RequestDto;
+import ru.practicum.dto.request.RequestUpdateDto;
 import ru.practicum.service.event.PrivateEventService;
 
 import javax.validation.Valid;
@@ -59,11 +60,11 @@ public class PrivateEventController {
         return privateEventService.getEventRequests(userId, eventId);
     }
 
-    @PatchMapping("/{eventId}/requests")
-    public EventRequestStatusUpdateResult changeStatus(@PathVariable Long userId,
-                                                       @PathVariable Long eventId,
-                                                       @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
 
+    @PatchMapping("/{eventId}/requests")
+    public RequestUpdateDto updateStatusRequest(@Positive @PathVariable Long userId,
+                                              @Positive @PathVariable Long eventId,
+                                              @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         return privateEventService.updateStatusRequest(userId, eventId, eventRequestStatusUpdateRequest);
     }
 }

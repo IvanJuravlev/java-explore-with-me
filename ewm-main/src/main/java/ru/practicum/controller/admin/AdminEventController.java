@@ -2,14 +2,12 @@ package ru.practicum.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventUpdateRequestDto;
 import ru.practicum.dto.event.FullEventDto;
 import ru.practicum.model.event.EventState;
 import ru.practicum.service.event.AdminEventService;
-import ru.practicum.service.event.utils.CustomPageRequest;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -31,8 +29,7 @@ public class AdminEventController {
                                         @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                         @Positive @RequestParam(defaultValue = "10") Integer size) {
         PageRequest pageable = PageRequest.of(from / size, size);
-        return adminEventService.getAdminEvents(users, states, categories, rangeStart, rangeEnd,
-                /*new CustomPageRequest(from, size, Sort.unsorted())*/ pageable); //ВОзможно вернуть создание через CustomPageRequest
+        return adminEventService.getAdminEvents(users, states, categories, rangeStart, rangeEnd, pageable);
     }
 
     @PatchMapping("/{eventId}")

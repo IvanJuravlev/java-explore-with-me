@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.dto.event.FullEventDto;
+import ru.practicum.exception.BadRequestException;
 import ru.practicum.model.request.Request;
 import ru.practicum.repository.RequestsRepository;
 import ru.practicum.statistics.StatService;
@@ -42,6 +43,7 @@ public class EventUtils {
         return new ArrayList<>(views.values());
     }
 
+
     private static Object getObject(StatService statService, Map<String, FullEventDto> views) {
         Object responseBody = statService.getViewStats(toString(MIN_TIME),
                         toString(MAX_TIME),
@@ -71,9 +73,15 @@ public class EventUtils {
         eventDtos.forEach(event -> event.setConfirmedRequests(counter.get(event.getId())));
     }
 
-
-
-
+    public static void checkDateTimePeriod(LocalDateTime rangeStart, LocalDateTime rangeEnd) {
+        if (rangeEnd != null && rangeEnd != null) {
+            if (rangeStart.isAfter(rangeEnd)) {
+                throw new BadRequestException(
+                        String.format("Start date: %s of the interval must be earlier than the end: %s date",
+                                rangeStart, rangeEnd));
+            }
+        }
+    }
 
 
 }

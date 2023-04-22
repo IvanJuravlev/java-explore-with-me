@@ -30,21 +30,21 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto update(Long id, CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> {
-            throw new ObjectNotFoundException(String.format("Category with id %x not found", id));
+    public CategoryDto update(long catId, CategoryDto categoryDto) {
+        Category category = categoryRepository.findById(catId).orElseThrow(() -> {
+            throw new ObjectNotFoundException("Category not found");
         });
         if (categoryDto.getName().equals(category.getName())) {
             throw new DuplicateDataException("Same category name");
         }
         category.setName(categoryDto.getName());
-        log.info("Category with id {} updated", id);
+        log.info("Category with id {} updated", catId);
         return CategoryMapper.CATEGORY_MAPPER.toCategoryDto(categoryRepository.save(category));
     }
 
     @Transactional
     public void delete(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> {
+        categoryRepository.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException(String.format("Category with id %x not found", id));
         });
         categoryRepository.deleteById(id);

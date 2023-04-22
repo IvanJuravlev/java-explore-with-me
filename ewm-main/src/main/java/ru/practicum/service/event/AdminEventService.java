@@ -1,22 +1,23 @@
 package ru.practicum.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.event.EventUpdateRequestDto;
 import ru.practicum.dto.event.FullEventDto;
-import ru.practicum.exception.BadRequestException;
+import ru.practicum.exception.ForbiddenException;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Category;
 import ru.practicum.model.event.AdminStateAction;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.EventState;
-import ru.practicum.repository.AdminEventRepository;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
-import ru.practicum.service.utils.DateFormatter;
+import ru.practicum.repository.LocationRepository;
+import ru.practicum.service.event.utils.EventUtils;
 
 
 import java.time.LocalDateTime;
@@ -25,24 +26,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AdminEventService {
     private final EventRepository eventRepository;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private final CategoryRepository categoryRepository;
-    private final AdminEventRepository adminEventRepository;
+    private final LocationRepository locationRepository;
 
 
     public List<FullEventDto> getAdminEvents(List<Long> users, List<EventState> states, List<Long> categories,
                                              String rangeStart, String rangeEnd, Pageable pageable) {
 
-        LocalDateTime start = rangeStart != null ? DateFormatter.toTime(rangeStart) : null;
-        LocalDateTime end = rangeEnd != null ? DateFormatter.toTime(rangeEnd) : null;
+        LocalDateTime start = rangeStart != null ? EventUtils.toTime(rangeStart) : null;
+        LocalDateTime end = rangeEnd != null ? EventUtils.toTime(rangeEnd) : null;
 
-        checkDateTimePeriod(start, end);
+        EventUtils.checkDateTimePeriod(start, end);
 
         List<Event> events = eventRepository.findAdminEvents(users, states, categories, start, end, pageable);
+        log.info("Events has been send");
 
         return events.stream()
                 .map(EventMapper.EVENT_MAPPER::toFullEventDto)
@@ -73,14 +77,14 @@ public class AdminEventService {
         if (eventUpdateRequestDto.getEventDate() != null) {
             if (LocalDateTime.parse(eventUpdateRequestDto.getEventDate(),dateTimeFormatter)
                     .isBefore(LocalDateTime.now())) {
-                throw new BadRequestException("date is in the past");
+                throw new ForbiddenException("date is in the past");
             } else {
                 event.setEventDate(LocalDateTime.parse(eventUpdateRequestDto.getEventDate(),
                         dateTimeFormatter));
             }
         }
         if (eventUpdateRequestDto.getLocation() != null) {
-            event.setLocation(eventUpdateRequestDto.getLocation());
+            event.setLocation(locationRepository.save(eventUpdateRequestDto.getLocation()));
         }
         if (eventUpdateRequestDto.getPaid() != null) {
             event.setPaid(eventUpdateRequestDto.getPaid());
@@ -91,6 +95,18 @@ public class AdminEventService {
         if (eventUpdateRequestDto.getRequestModeration() != null) {
             event.setRequestModeration(eventUpdateRequestDto.getRequestModeration());
         }
+        if (event.getEventState() == EventState.PUBLISHED
+                && eventUpdateRequestDto.getStateAction().equalsIgnoreCase(AdminStateAction.PUBLISH_EVENT.name())) {
+            throw new ForbiddenException("Event is already published");
+        }
+        if (event.getEventState() == EventState.CANCELED
+                && eventUpdateRequestDto.getStateAction().equalsIgnoreCase(AdminStateAction.PUBLISH_EVENT.name())) {
+            throw new ForbiddenException("Event is canceled");
+        }
+        if (event.getEventState() == EventState.PUBLISHED
+                && eventUpdateRequestDto.getStateAction().equalsIgnoreCase(AdminStateAction.REJECT_EVENT.name())) {
+            throw new ForbiddenException("Event is published. You can't reject it");
+        }
         if (eventUpdateRequestDto.getStateAction() != null) {
             if (eventUpdateRequestDto.getStateAction().equals(AdminStateAction.PUBLISH_EVENT.name())) {
                 event.setEventState(EventState.PUBLISHED);
@@ -100,18 +116,7 @@ public class AdminEventService {
                 event.setEventState(EventState.CANCELED);
             }
         }
+        log.info("Event with id {} is updated", eventId);
         return EventMapper.EVENT_MAPPER.toFullEventDto(event);
     }
-
-    private void checkDateTimePeriod(LocalDateTime rangeStart, LocalDateTime rangeEnd) {
-        if (rangeEnd != null && rangeEnd != null) {
-            if (rangeStart.isAfter(rangeEnd)) {
-                throw new BadRequestException(
-                        String.format("Start date: %s of the interval must be earlier than the end: %s date",
-                                rangeStart, rangeEnd));
-            }
-        }
-    }
-
-
 }
