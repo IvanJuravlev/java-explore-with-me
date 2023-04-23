@@ -74,7 +74,7 @@ public class EventUtils {
     }
 
     public static void checkDateTimePeriod(LocalDateTime rangeStart, LocalDateTime rangeEnd) {
-        if (rangeEnd != null && rangeEnd != null) {
+        if (rangeEnd != null && rangeStart != null) {
             if (rangeStart.isAfter(rangeEnd)) {
                 throw new BadRequestException(
                         String.format("Start date: %s of the interval must be earlier than the end: %s date",
