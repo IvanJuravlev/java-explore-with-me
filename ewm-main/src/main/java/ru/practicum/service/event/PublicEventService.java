@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.event.FullEventDto;
 import ru.practicum.dto.event.ShortEventDto;
-import ru.practicum.exception.ForbiddenException;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.event.Event;

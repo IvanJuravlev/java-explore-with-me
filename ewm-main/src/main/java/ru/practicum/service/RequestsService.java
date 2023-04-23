@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.RequestDto;
-import ru.practicum.dto.request.RequestUpdateDto;
-import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ForbiddenException;
 import ru.practicum.exception.ObjectNotFoundException;
 import ru.practicum.mapper.RequestMapper;
@@ -21,7 +18,6 @@ import ru.practicum.repository.RequestsRepository;
 import ru.practicum.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
