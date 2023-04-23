@@ -21,7 +21,7 @@ services:
       - POSTGRES_USER=Ivan
       - POSTGRES_PASSWORD=12345
 
-  main-service:
+  ewm-service:
     build: ewm-main
     image: ewm-main
     container_name: ewm_main_container
