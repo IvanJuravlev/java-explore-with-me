@@ -14,6 +14,5 @@ import javax.validation.constraints.NotNull;
 public class CategoryDto {
     Long id;
     @NotBlank
-    @NotNull
     String name;
 }
