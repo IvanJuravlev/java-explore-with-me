@@ -1,32 +1,20 @@
 package ru.practicum.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.model.ViewStats;
 
-public class StatsMapper {
-    public static EndpointHitDto toEndpointHitDto(EndpointHit endpointHit) {
-        return new EndpointHitDto(endpointHit.getId(),
-                endpointHit.getApp(),
-                endpointHit.getUri(),
-                endpointHit.getIp(),
-                endpointHit.getTimestamp());
-    }
+@Mapper
+public interface StatsMapper {
 
-    public static EndpointHit toEndpointHit(EndpointHitDto endpointHitDto) {
-        return new EndpointHit(endpointHitDto.getId(),
-                endpointHitDto.getApp(),
-                endpointHitDto.getUri(),
-                endpointHitDto.getIp(),
-                endpointHitDto.getTimestamp());
-    }
+    StatsMapper STATS_MAPPER = Mappers.getMapper(StatsMapper.class);
 
-    public static ViewStatsDto toViewStatsDto(ViewStats viewStats) {
-        return new ViewStatsDto(viewStats.getApp(),
-                viewStats.getUri(),
-                viewStats.getHits());
-    }
+    EndpointHitDto toEndpointHitDto(EndpointHit endpointHit);
 
+    EndpointHit toEndpointHit(EndpointHitDto endpointHitDto);
 
+    ViewStatsDto toViewStatsDto(ViewStats viewStats);
 }
