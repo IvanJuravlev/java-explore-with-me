@@ -12,10 +12,12 @@ import ru.practicum.model.Comment;
 public interface CommentMapper {
 
     CommentMapper COMMENT_MAPPER = Mappers.getMapper(CommentMapper.class);
+
     Comment createCommentDtoToComment(CreateCommentDto createCommentDto);
 
     @Mapping(target = "eventId", source = "event.id")
     @Mapping(target = "author", source = "author.id")
     CommentDto commentToCommentDto(Comment comment);
+
     ShortCommentDto commentToShortCommentDto(Comment comment);
 }
