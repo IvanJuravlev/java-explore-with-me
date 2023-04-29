@@ -49,7 +49,7 @@ public class CommentService {
         checkUser(userId);
         Comment comment = checkComment(commentId);
 
-        if (comment.getAuthor().getId() != userId) {
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new ForbiddenException("Only author can edit comment");
         }
 
