@@ -21,7 +21,7 @@ public class PublicCommentController {
     private final CommentService commentService;
 
     @GetMapping
-    public List<ShortCommentDto> getComments(@RequestParam long eventId,
+    public List<ShortCommentDto> getComments(@RequestParam Long eventId,
                                              @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                              @RequestParam(defaultValue = "10") @Positive Integer size) {
         PageRequest pageable = PageRequest.of(from / size, size);
@@ -29,7 +29,7 @@ public class PublicCommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentDto getComment(@PathVariable long commentId) {
+    public CommentDto getComment(@PathVariable Long commentId) {
         return commentService.getComment(commentId);
     }
 }
